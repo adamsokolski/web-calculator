@@ -4,6 +4,7 @@ let firstNumberInt;
 let numbersArr = []; // * Array with every number typed in
 let resultInt;
 let signArr = [];
+let signCounter = 0;
 
 function init() {
   document
@@ -16,6 +17,10 @@ function init() {
           operationClicked();
         } else if (event.target.className.includes("equal-box") === true) {
           calucate();
+        } else if (event.target.className.includes("backspace-box") === true) {
+          backspace();
+        } else if (event.target.className.includes("clear-box") === true) {
+          clearClicked();
         }
       }
     });
@@ -23,21 +28,34 @@ function init() {
 
 function numberClicked() {
   // * Keeping track of every number clicked and throwing it in array
+  signCounter = 0;
   firstNumberArr.push(event.target.innerText);
   firstNumberInt = Number(firstNumberArr.join(""));
-  console.log(`Current number ${firstNumberInt}`);
-  displayResult();
+  /* console.log(`Current number ${firstNumberInt}`); */
+  displayResult("Number");
 }
 
 function operationClicked() {
-  numbersArr.push(firstNumberInt);
-  signArr.push(event.target.innerText);
-  firstNumberArr = [];
-  firstNumberInt = null;
-  console.log(numbersArr);
-  console.log(signArr);
+  signCounter += 1;
+  if (signCounter === 1) {
+    numbersArr = numbersArr.filter(Number);
+    numbersArr.push(firstNumberInt);
+    signArr.push(event.target.innerText);
+    firstNumberArr = [];
+    firstNumberInt = null;
+    /*  console.log(numbersArr);
+    console.log(signArr); */
+    displayResult("Sign");
+  } else if (signCounter === 2) {
+    signArr.pop();
+    signCounter = 0;
+    operationClicked();
+  }
 }
+
 function calucate() {
+  numbersArr = numbersArr.filter(Number);
+  signCounter = 0;
   numbersArr.push(firstNumberInt);
   firstNumberArr = [];
   firstNumberInt = null;
@@ -64,13 +82,39 @@ function calucate() {
       }
     }
   }
-  console.log(`Result: ${resultInt}`);
+  /*   console.log(`Result: ${resultInt}`); */
+  displayResult("Result");
 }
 
-function equalClicked() {}
+function backspace() {
+  firstNumberArr.pop();
+  firstNumberInt = Number(firstNumberArr.join(""));
+  /*  console.log(`Current number ${firstNumberInt}`); */
+  displayResult("Number");
+}
 
-function displayResult() {
-  result.innerText = resultInt;
+function clearClicked() {
+  firstNumberArr = [];
+  firstNumberInt = null;
+  numbersArr = [];
+  resultInt = null;
+  signArr = [];
+  signCounter = 0;
+  displayResult("clearRes");
+  /* console.log("Cleared"); */
+}
+
+function displayResult(stage) {
+  if (stage === "Number") {
+    result.innerText = firstNumberInt;
+  } else if (stage === "Result") {
+    result.innerText = resultInt;
+  } else if (stage === "Sign") {
+    let currentSign = signArr[signArr.length - 1];
+    result.innerText = `${currentSign}`;
+  } else if (stage === "clearRes") {
+    result.innerText = "0";
+  }
 }
 
 init();
